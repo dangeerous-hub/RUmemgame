@@ -68,15 +68,29 @@ export default function Home() {
   saveWinner()
 }, [pairs, time, username, win])
 
-  const startGame = () => {
-    if (!username.trim()) {
-      alert("Please enter a username")
-      return
-    }
-
-    setDeck(generateDeck())
-    setStarted(true)
+const startGame = async () => {
+  if (!username.trim()) {
+    alert("Please enter a username")
+    return
   }
+
+  const generatedDeck = generateDeck()
+
+  // preload images
+  await Promise.all(
+    generatedDeck.map((card) => {
+      return new Promise((resolve) => {
+        const img = new Image()
+        img.src = card.img
+        img.onload = resolve
+        img.onerror = resolve
+      })
+    })
+  )
+
+  setDeck(generatedDeck)
+  setStarted(true)
+}
 
   const handleFlip = (card: CardType) => {
     if (gameOver) return
